@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ApiCatalogoJogos.InputModel;
+using ApiCatalogoJogos.ViewModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,25 +14,25 @@ namespace ApiCatalogoJogos.Controllers.V1
     public class GamesController : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<List<Object>>> Get()
+        public async Task<ActionResult<List<GameViewModel>>> Get()
         {
             return Ok();
         }
 
         [HttpGet("{idGame:guid}")]
-        public async Task<ActionResult<Object>> Get(Guid idGame)
+        public async Task<ActionResult<GameViewModel>> Get(Guid idGame)
         {
             return Ok();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Object>> Insert(Object game)
+        public async Task<ActionResult<GameViewModel>> Insert(GameInputModel game)
         {
             return Ok();
         }
 
         [HttpPut("{idGame:guid}")]
-        public async Task<ActionResult> Update(Guid idGame, Object game)
+        public async Task<ActionResult> Update(Guid idGame, Object GameInputModel)
         {
             return Ok();
         }
