@@ -52,7 +52,7 @@ namespace ApiCatalogoJogos.Controllers.V1
         /// </summary>
         /// <param name="idGame">Id do Jogo buscado</param>
         /// <response code="200">Retorna o jogo filtrado</response>
-        /// <response code="204">Caso não haja o jogo"</response>
+        /// <response code="204">Caso não haja o jogo</response>
         /// <returns></returns>
         [HttpGet("{idGame:guid}")]
         public async Task<ActionResult<GameViewModel>> Get([FromRoute] Guid idGame)
@@ -66,7 +66,13 @@ namespace ApiCatalogoJogos.Controllers.V1
 
             return Ok(game);
         }
-
+        /// <summary>
+        /// Cadastra um jogo
+        /// </summary>
+        /// <param name="gameInputModel"></param>
+        /// <response code="200">Salvo com sucesso</response>
+        /// <response code="422">Jogo já existe</response>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<GameViewModel>> Insert([FromBody] GameInputModel gameInputModel)
         {
@@ -82,6 +88,14 @@ namespace ApiCatalogoJogos.Controllers.V1
             }
         }
 
+        /// <summary>
+        /// Editar um Jogo
+        /// </summary>
+        /// <param name="idGame">Id do jogo</param>
+        /// <param name="gameInputModel"></param>
+        /// <response code="200">Jogo editado com sucesso.</response>
+        /// <response code="404">Jogo não encontrado</response>
+        /// <returns></returns>
         [HttpPut("{idGame:guid}")]
         public async Task<ActionResult> Update([FromRoute] Guid idGame, [FromBody] GameInputModel gameInputModel)
         {
@@ -96,6 +110,14 @@ namespace ApiCatalogoJogos.Controllers.V1
             }
         }
 
+        /// <summary>
+        /// Edita preço de um jogo
+        /// </summary>
+        /// <param name="idGame">Id do jogo</param>
+        /// <param name="price">Preço do jogo</param>
+        /// <response code="200">Preço do jogo editado com sucesso.</response>
+        /// <response code="404">Jogo não encontrado</response>
+        /// <returns></returns>
         [HttpPatch("{idGame:guid}/price/{price:double}")]
         public async Task<ActionResult> Update([FromRoute] Guid idGame, [FromRoute] Double price)
         {
@@ -110,6 +132,13 @@ namespace ApiCatalogoJogos.Controllers.V1
             }
         }
 
+        /// <summary>
+        /// Apaga um Jogo
+        /// </summary>
+        /// <param name="idGame">Id do jogo</param>
+        /// <response code="200">Jogo apagado com sucesso.</response>
+        /// <response code="404">Jogo não encontrado</response>
+        /// <returns></returns>
         [HttpDelete("{idGame:guid}")]
         public async Task<ActionResult> Delete([FromRoute] Guid idGame)
         {

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -18,11 +19,14 @@ namespace ApiCatalogoJogos.Repository
 
         public async Task Delete(Guid id)
         {
-            var command = $"DELETE FROM Games WHERE Id = '{id}'";
+            var sql = $"DELETE FROM Games WHERE Id = @ID";
 
             await sqlConnection.OpenAsync();
-            SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
-            await sqlCommand.ExecuteNonQueryAsync();
+            SqlCommand command = new SqlCommand(sql, sqlConnection);
+            command.Parameters.Add("@ID", SqlDbType.UniqueIdentifier);
+            command.Parameters["@ID"].Value = id;
+
+            await command.ExecuteNonQueryAsync();
             await sqlConnection.CloseAsync();
         }
 
@@ -36,11 +40,16 @@ namespace ApiCatalogoJogos.Repository
         {
             List<Game> games = new List<Game>();
 
-            string command = $"SELECT * FROM Games ORDER BY Id OFFSET {((page - 1) * amount)} ROWS FETCH NEXT {amount} ROWS ONLY";
+            string sql = $"SELECT * FROM Games ORDER BY Id OFFSET @Page ROWS FETCH NEXT @Amount ROWS ONLY";
 
             await sqlConnection.OpenAsync();
-            SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
-            SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            SqlCommand command = new SqlCommand(sql, sqlConnection);
+            command.Parameters.Add("@Page", SqlDbType.Int);
+            command.Parameters.Add("@Amount", SqlDbType.Int);
+            command.Parameters["@Page"].Value = ((page - 1) * amount);
+            command.Parameters["@Amount"].Value = amount;
+
+            SqlDataReader sqlDataReader = await command.ExecuteReaderAsync();
 
             while (sqlDataReader.Read())
             {
@@ -51,9 +60,9 @@ namespace ApiCatalogoJogos.Repository
                     Producer = (string)sqlDataReader["Producer"],
                     Price = (double)sqlDataReader["Price"]
                 });
-
-                await sqlConnection.CloseAsync();
             }
+
+            await sqlConnection.CloseAsync();
 
             return games;
 
@@ -63,11 +72,14 @@ namespace ApiCatalogoJogos.Repository
         {
             Game game = null;
 
-            var command = $"SELECT * FROM Games WHERE Id {id}";
+            var sql = $"SELECT * FROM Games WHERE Id = @ID";
 
             await sqlConnection.OpenAsync();
-            SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
-            SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            SqlCommand command = new SqlCommand(sql, sqlConnection);
+            command.Parameters.Add("@ID", SqlDbType.UniqueIdentifier);
+            command.Parameters["@ID"].Value = id;
+
+            SqlDataReader sqlDataReader = await command.ExecuteReaderAsync();
 
             while (sqlDataReader.Read())
             {
@@ -78,9 +90,10 @@ namespace ApiCatalogoJogos.Repository
                     Producer = (string)sqlDataReader["Producer"],
                     Price = (double)sqlDataReader["Price"]
                 };
-
-                await sqlConnection.CloseAsync();
             }
+
+            await sqlConnection.CloseAsync();
+
             return game;
         }
 
@@ -88,11 +101,16 @@ namespace ApiCatalogoJogos.Repository
         {
             List<Game> games = new List<Game>();
 
-            string command = $"SELECT * FROM Games WHERE Name = '{name}' AND Producer '{producer}'";
+            string sql = $"SELECT * FROM Games WHERE Name = @Name AND Producer = @Producer";
 
             await sqlConnection.OpenAsync();
-            SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
-            SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync();
+            SqlCommand command = new SqlCommand(sql, sqlConnection);
+            command.Parameters.Add("@Name", SqlDbType.VarChar,100);
+            command.Parameters.Add("@Producer", SqlDbType.VarChar, 100);
+            command.Parameters["@Name"].Value = name;
+            command.Parameters["@Producer"].Value = producer;
+
+            SqlDataReader sqlDataReader = await command.ExecuteReaderAsync();
 
             while (sqlDataReader.Read())
             {
@@ -103,30 +121,48 @@ namespace ApiCatalogoJogos.Repository
                     Producer = (string)sqlDataReader["Producer"],
                     Price = (double)sqlDataReader["Price"]
                 });
-
-                await sqlConnection.CloseAsync();
             }
+            await sqlConnection.CloseAsync();
 
             return games;
         }
 
         public async Task Insert(Game game)
         {
-            var command = $"INSERT Games (Id, Name, Producer, Price) VALUES ('{game.Id}', '{game.Name}', '{game.Producer}', '{game.Price.ToString().Replace(",", ".")}')";
+            var sql = $"INSERT Games (Id, Name, Producer, Price) VALUES (@ID, @Name, @Producer, @Price)";
 
             await sqlConnection.OpenAsync();
-            SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
-            await sqlCommand.ExecuteNonQueryAsync();
+            SqlCommand command = new SqlCommand(sql, sqlConnection);
+            command.Parameters.Add("@ID", SqlDbType.UniqueIdentifier);
+            command.Parameters.Add("@Name", SqlDbType.VarChar, 100);
+            command.Parameters.Add("@Producer", SqlDbType.VarChar, 100);
+            command.Parameters.Add("@Price", SqlDbType.Float);
+
+            command.Parameters["@ID"].Value = game.Id;
+            command.Parameters["@Name"].Value = game.Name;
+            command.Parameters["@Producer"].Value = game.Producer;
+            command.Parameters["@Price"].Value = game.Price;
+
+            await command.ExecuteNonQueryAsync();
             await sqlConnection.CloseAsync();
         }
 
         public async Task Update(Game game)
         {
-            var command = $"UPDATE Games SET Id = '{game.Id}', Name = '{game.Name}', Producer = '{game.Producer}', Price = '{game.Price.ToString().Replace(",", ".")}' WHERE Id = '{game.Id}'";
+            var sql = $"UPDATE Games SET Id = @ID, Name = @Name, Producer = @Producer, Price = @Price WHERE Id = @ID";
 
             await sqlConnection.OpenAsync();
-            SqlCommand sqlCommand = new SqlCommand(command, sqlConnection);
-            await sqlCommand.ExecuteNonQueryAsync();
+            SqlCommand command = new SqlCommand(sql, sqlConnection);
+            command.Parameters.Add("@ID", SqlDbType.UniqueIdentifier);
+            command.Parameters.Add("@Name", SqlDbType.VarChar, 100);
+            command.Parameters.Add("@Producer", SqlDbType.VarChar, 100);
+            command.Parameters.Add("@Price", SqlDbType.Float);
+
+            command.Parameters["@ID"].Value = game.Id;
+            command.Parameters["@Name"].Value = game.Name;
+            command.Parameters["@Producer"].Value = game.Producer;
+            command.Parameters["@Price"].Value = game.Price;
+            await command.ExecuteNonQueryAsync();
             await sqlConnection.CloseAsync();
         }
     }
