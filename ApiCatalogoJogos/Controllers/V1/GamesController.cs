@@ -1,4 +1,5 @@
-﻿using ApiCatalogoJogos.InputModel;
+﻿using ApiCatalogoJogos.Exceptions;
+using ApiCatalogoJogos.InputModel;
 using ApiCatalogoJogos.Services;
 using ApiCatalogoJogos.ViewModel;
 using Microsoft.AspNetCore.Http;
@@ -58,8 +59,7 @@ namespace ApiCatalogoJogos.Controllers.V1
                 return Ok(game);
                 
             }
-            //catch (RegisteredGameException ex)
-            catch(Exception ex)
+            catch (RegisteredGameException ex)
             {
                 return UnprocessableEntity("Já existe um jogo com este nome para esta produtora");
             }
@@ -73,8 +73,7 @@ namespace ApiCatalogoJogos.Controllers.V1
                 await _gameService.Update(idGame, gameInputModel);
                 return Ok();
             }
-            //catch (GameNotRegisteredException ex)
-            catch(Exception ex)
+            catch (GameNotRegisteredException ex)
             {
                 return NotFound("Jogo não existe");
             }
@@ -88,8 +87,7 @@ namespace ApiCatalogoJogos.Controllers.V1
                 await _gameService.Update(idGame, price);
                 return Ok();
             }
-            //catch (GameNotRegisteredException ex)
-            catch (Exception ex)
+            catch (GameNotRegisteredException ex)
             {
                 return NotFound("Jogo não existe");
             }
@@ -103,8 +101,7 @@ namespace ApiCatalogoJogos.Controllers.V1
                 await _gameService.Delete(idGame);
                 return Ok();
             }
-            //catch (GameNotRegisteredException ex)
-            catch (Exception ex)
+            catch (GameNotRegisteredException ex)
             {
                 return NotFound("Jogo não existe");
             }
