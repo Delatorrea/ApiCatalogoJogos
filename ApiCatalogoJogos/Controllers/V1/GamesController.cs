@@ -2,12 +2,10 @@
 using ApiCatalogoJogos.InputModel;
 using ApiCatalogoJogos.Services;
 using ApiCatalogoJogos.ViewModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiCatalogoJogos.Controllers.V1
@@ -23,6 +21,18 @@ namespace ApiCatalogoJogos.Controllers.V1
             _gameService = gameService;
         }
 
+        /// <summary>
+        /// Buscar todos os jogos de forma paginada
+        /// </summary>
+        /// <remarks>
+        /// Não é possível retornar os jogos sem paginação
+        /// </remarks>
+        /// <param name="page">Indica qual página está sendo consultada. Mínimo 1</param>
+        /// <param name="amount">Indica a quantidade de registros por página. Mínimo 1 e máximo 50</param>
+        /// <response code="200">Retorna a lista de jogos</response>
+        /// <response code="204">Caso não haja jogos"</response>
+        /// <returns></returns>
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameViewModel>>> Get(
             [FromQuery, Range(1, int.MaxValue)] int page = 1, [FromQuery, Range(1,50)] int amount = 5)
@@ -37,6 +47,13 @@ namespace ApiCatalogoJogos.Controllers.V1
             return Ok(games);
         }
 
+        /// <summary>
+        /// Buscar um jogo pelo seu Id
+        /// </summary>
+        /// <param name="idGame">Id do Jogo buscado</param>
+        /// <response code="200">Retorna o jogo filtrado</response>
+        /// <response code="204">Caso não haja o jogo"</response>
+        /// <returns></returns>
         [HttpGet("{idGame:guid}")]
         public async Task<ActionResult<GameViewModel>> Get([FromRoute] Guid idGame)
         {

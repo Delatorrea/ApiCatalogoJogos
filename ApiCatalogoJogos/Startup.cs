@@ -1,18 +1,15 @@
+using ApiCatalogoJogos.Middleware;
 using ApiCatalogoJogos.Repository;
 using ApiCatalogoJogos.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 
 namespace ApiCatalogoJogos
 {
@@ -30,12 +27,17 @@ namespace ApiCatalogoJogos
         {
 
             services.AddScoped<IGameService, GameService>();
-            services.AddScoped<IGameRepository, GameRepository>();
+            services.AddScoped<IGameRepository, GameSqlServerRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiCatalogoJogos", Version = "v1" });
+
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string fileName = typeof(Startup).GetTypeInfo().Assembly.GetName().Name + ".xml";
+                c.IncludeXmlComments(Path.Combine(basePath, fileName));
+
             });
         }
 
@@ -48,6 +50,8 @@ namespace ApiCatalogoJogos
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiCatalogoJogos v1"));
             }
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 
